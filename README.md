@@ -36,7 +36,7 @@ Card avanzata per Home Assistant che mostra informazioni dettagliate sulle perso
 2. Vai su "Frontend"
 3. Clicca sui tre puntini in alto a destra
 4. Seleziona "Repository personalizzati"
-5. Aggiungi questo URL: `https://github.com/yourusername/person-tracker-card`
+5. Aggiungi questo URL: `https://github.com/djdevil/person-tracker-card`
 6. Seleziona categoria "Lovelace"
 7. Clicca su "Aggiungi"
 8. Cerca "Person Tracker Card" e installala
