@@ -1,8 +1,7 @@
 {
   "name": "Person Tracker Card",
   "render_readme": true,
-  "filename": "person-tracker-card.js",
+  "filename": "dist/person-tracker-card.js",  // ← Aggiungi dist/
   "country": "IT",
-  "homeassistant": "2023.1.0",
-  "content_in_root": false
+  "homeassistant": "2023.1.0"
 }
