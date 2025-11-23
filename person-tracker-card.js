@@ -19,7 +19,9 @@ class PersonTrackerCard extends LitElement {
       _activity: { state: true },
       _connectionType: { state: true },
       _distanceFromHome: { state: true },
-      _travelTime: { state: true }
+      _travelTime: { state: true },
+      _watchBatteryLevel: { state: true },
+      _watchBatteryIcon: { state: true }
     };
   }
 
@@ -30,6 +32,8 @@ class PersonTrackerCard extends LitElement {
     this._activity = 'unknown';
     this._connectionType = 'unknown';
     this._distanceFromHome = 0;
+    this._watchBatteryLevel = 0;
+    this._watchBatteryIcon = 'mdi:battery';
     this._travelTime = 0;
   }
 
@@ -44,9 +48,20 @@ class PersonTrackerCard extends LitElement {
     return document.createElement('person-tracker-card-editor');
   }
 
-  static getStubConfig() {
+  static getStubConfig(hass) {
+    let defaultEntity = '';
+
+    if (hass && hass.states) {
+      const personEntities = Object.keys(hass.states).filter(
+        eid => eid.startsWith('person.')
+      );
+      if (personEntities.length > 0) {
+        defaultEntity = personEntities[0];
+      }
+    }
+
     return {
-      entity: 'person',  // Only include the domain, the editor will handle the rest
+      entity: defaultEntity,
       type: 'custom:person-tracker-card'
     };
   }
@@ -61,6 +76,9 @@ class PersonTrackerCard extends LitElement {
 
     // Default configuration with all new options
     this.config = {
+      // Layout
+      layout: 'classic',
+      compact_width: 300,
       // Display
       show_entity_picture: true,
       show_name: true,
@@ -68,6 +86,7 @@ class PersonTrackerCard extends LitElement {
       show_battery: true,
       show_activity: true,
       show_distance: true,
+      show_watch_battery: true,
       show_travel_time: true,
       show_connection: true,
       // Layout
@@ -81,12 +100,14 @@ class PersonTrackerCard extends LitElement {
       picture_size: 55,
       // Element positions
       battery_position: 'top-right',
+      watch_battery_position: 'top-right-2',
       activity_position: 'bottom-left',
       distance_position: 'top-left',
       travel_position: 'top-left-2',
       connection_position: 'bottom-right',
       // Element font sizes
       battery_font_size: '13px',
+      watch_battery_font_size: '13px',
       activity_font_size: '13px',
       distance_font_size: '12px',
       travel_font_size: '12px',
@@ -149,6 +170,9 @@ class PersonTrackerCard extends LitElement {
     if (this.config.show_battery) {
       entities.push(this.config.battery_sensor || `sensor.phone_${entityBase}_battery_level`);
     }
+    if (this.config.show_watch_battery) {
+      entities.push(this.config.watch_battery_sensor || `sensor.watch_${entityBase}_battery_level`);
+    }
     if (this.config.show_activity) {
       entities.push(this.config.activity_sensor || `sensor.phone_${entityBase}_activity`);
     }
@@ -177,7 +201,15 @@ class PersonTrackerCard extends LitElement {
         this._batteryIcon = batteryEntity.attributes?.icon || 'mdi:battery';
       }
     }
-
+    // Watch Battery
+    if (this.config.show_watch_battery) {
+      const watchBatteryEntityId = this.config.watch_battery_sensor || `sensor.watch_${entityBase}_battery_level`;
+      const watchBatteryEntity = this.hass.states[watchBatteryEntityId];
+      if (watchBatteryEntity) {
+        this._watchBatteryLevel = parseFloat(watchBatteryEntity.state) || 0;
+        this._watchBatteryIcon = watchBatteryEntity.attributes?.icon || 'mdi:battery';
+      }
+    }
     // Activity
     if (this.config.show_activity) {
       const activityEntityId = this.config.activity_sensor || `sensor.phone_${entityBase}_activity`;
@@ -228,13 +260,16 @@ class PersonTrackerCard extends LitElement {
     return icons[this._activity] || '';
   }
 
-  _getBatteryColor() {
-    if (this._batteryLevel < 20) return '#e45649';
-    if (this._batteryLevel < 30) return '#ff9800';
-    if (this._batteryLevel < 50) return '#ffa229';
-    if (this._batteryLevel < 80) return '#8bc34a';
+  _getBatteryColor(level) {
+    const batteryLevel = level !== undefined ? level : this._batteryLevel;
+    if (batteryLevel < 20) return '#e45649';
+    if (batteryLevel < 30) return '#ff9800';
+    if (batteryLevel < 50) return '#ffa229';
+    if (batteryLevel < 80) return '#8bc34a';
     return '#50A14F';
   }
+
+
 
   _getCurrentStateConfig() {
     if (!this.config.state || !this.hass) return undefined;
@@ -268,9 +303,9 @@ class PersonTrackerCard extends LitElement {
   _getPositionStyles(position) {
     const positions = {
       'top-left': { top: '8px', left: '8px' },
-      'top-left-2': { top: '28px', left: '8px' },
       'top-right': { top: '8px', right: '8px' },
-      'top-right-2': { top: '28px', right: '8px' },
+      'top-left-2': { top: '40px', left: '8px' },
+      'top-right-2': { top: '40px', right: '8px' },
       'bottom-left': { bottom: '8px', left: '8px' },
       'bottom-left-2': { bottom: '28px', left: '8px' },
       'bottom-right': { bottom: '8px', right: '8px' },
@@ -289,6 +324,27 @@ class PersonTrackerCard extends LitElement {
       return html``;
     }
 
+    // If no entity is configured, show a different message
+    if (!this.config.entity) {
+      return html`
+        <ha-card>
+          <div class="warning">
+            <ha-icon icon="mdi:account-question"></ha-icon>
+            <span>Please select a person entity in the configuration</span>
+          </div>
+        </ha-card>
+      `;
+    }
+
+    // Scegli il layout in base alla configurazione
+    if (this.config.layout === 'compact') {
+      return this._renderCompactLayout();
+    } else {
+      return this._renderClassicLayout();
+    }
+  }
+
+  _renderClassicLayout() {
     const entity = this.hass.states[this.config.entity];
 
 
@@ -310,6 +366,7 @@ class PersonTrackerCard extends LitElement {
 
     // Posizioni elementi con fallback sicuro
     const batteryPos = this._getPositionStyles(this.config.battery_position) || {};
+    const watchBatteryPos = this._getPositionStyles(this.config.watch_battery_position) || {};
     const activityPos = this._getPositionStyles(this.config.activity_position) || {};
     const distancePos = this._getPositionStyles(this.config.distance_position) || {};
     const travelPos = this._getPositionStyles(this.config.travel_position) || {};
@@ -354,6 +411,17 @@ class PersonTrackerCard extends LitElement {
               </div>
             ` : ''}
 
+            ${this.config.show_watch_battery ? html`
+              <div class="custom-field watch-battery"
+                   style="color: ${this._getBatteryColor(this._watchBatteryLevel)};
+                          font-size: ${this.config.watch_battery_font_size};
+                          ${Object.entries(watchBatteryPos).map(([k, v]) => `${k}: ${v}`).join('; ')}">
+                <span>⌚</span>
+                <ha-icon icon="${this._watchBatteryIcon}" .style=${'width: 16px; height: 16px;'}></ha-icon>
+                <span>${this._watchBatteryLevel}%</span>
+              </div>
+            ` : ''}
+
             ${this.config.show_activity && this._activity && this._activity !== 'unknown' && activityIcon ? html`
               <div class="custom-field activity"
                    style="font-size: ${this.config.activity_font_size};
@@ -386,6 +454,106 @@ class PersonTrackerCard extends LitElement {
                    style="font-size: ${this.config.connection_font_size};
                           ${Object.entries(connectionPos).map(([k, v]) => `${k}: ${v}`).join('; ')}">
                 <ha-icon icon="${connectionIcon}" .style=${'width: 16px; height: 16px;'}></ha-icon>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      </ha-card>
+    `;
+  }
+
+  _renderCompactLayout() {
+    const entity = this.hass.states[this.config.entity];
+    const stateConfig = this._getCurrentStateConfig();
+    
+    // Nome della persona (non dello stato!)
+    const personName = this.config.name || entity.attributes?.friendly_name || 'Person';
+    
+    // Nome dello stato personalizzato (location)
+    const displayLocation = stateConfig?.name || entity.state;
+    
+    const entityPicture = stateConfig?.entity_picture || this.config.entity_picture || entity.attributes?.entity_picture;
+    const stateStyles = stateConfig?.styles?.name || {};
+    
+    // Activity icon e color
+    const activityIcon = this._getActivityIcon();
+    let activityColor = 'var(--secondary-text-color)';
+    if (this._activity === 'Stationary') activityColor = 'green';
+    else if (this._activity === 'Walking' || this._activity === 'Running') activityColor = 'orange';
+    else if (this._activity === 'Automotive') activityColor = 'blue';
+    
+    // Connection
+    const connectionIcon = this._connectionType === 'Wi-Fi' ? 'mdi:wifi' : 'mdi:signal';
+    const connectionColor = this._connectionType === 'Wi-Fi' ? 'blue' : 'orange';
+    
+    // Battery color
+    const batteryColor = this._getBatteryColor();
+    
+    // Larghezza configurabile
+    const maxWidth = this.config.compact_width || 300;
+    
+    return html`
+      <ha-card style="background: ${this.config.card_background}; border-radius: ${this.config.card_border_radius}; padding: 8px; max-width: ${maxWidth}px;">
+        <div class="compact-grid">
+          ${this.config.show_entity_picture && entityPicture ? html`
+            <div class="compact-picture">
+              <img src="${entityPicture}" alt="${personName}" />
+            </div>
+          ` : ''}
+          
+          ${this.config.show_name ? html`
+            <div class="compact-name" style="color: inherit">
+              ${personName}
+            </div>
+          ` : ''}
+          
+          <div class="compact-location" style="color: ${stateStyles.color || 'var(--secondary-text-color)'}">
+            ${displayLocation}
+          </div>
+          
+          <div class="compact-icons">
+            ${this.config.show_activity && activityIcon ? html`
+              <div class="compact-icon-badge">
+                <ha-icon icon="${activityIcon}" style="--mdc-icon-size: 16px; color: ${activityColor};"></ha-icon>
+              </div>
+            ` : ''}
+            
+            ${this.config.show_connection ? html`
+              <div class="compact-icon-badge">
+                <ha-icon icon="${connectionIcon}" style="--mdc-icon-size: 16px; color: ${connectionColor};"></ha-icon>
+              </div>
+            ` : ''}
+            
+            ${this.config.show_battery ? html`
+              <div class="compact-icon-badge">
+                <span style="font-size: 9px; font-weight: bold; color: ${batteryColor};">${this._batteryLevel}%</span>
+              </div>
+            ` : ''}
+            
+            ${this.config.show_watch_battery ? html`
+              <div class="compact-icon-badge">
+                <span>⌚</span>
+                <span style="font-size: 9px; font-weight: bold; color: ${this._getBatteryColor(this._watchBatteryLevel)};">
+                  ${this._watchBatteryLevel}%
+                </span>
+              </div>
+            ` : ''}
+            
+            ${this.config.show_distance && this._distanceFromHome > 0 ? html`
+              <div class="compact-icon-badge" style="flex-direction: column;">
+                <ha-icon icon="mdi:home" style="--mdc-icon-size: 12px;"></ha-icon>
+                <span style="font-size: 8px; font-weight: bold; color: #4A9EFF; margin-top: -2px;">
+                  ${Math.round(this._distanceFromHome)}
+                </span>
+              </div>
+            ` : ''}
+            
+            ${this.config.show_travel_time && this._travelTime > 0 ? html`
+              <div class="compact-icon-badge" style="flex-direction: column;">
+                <ha-icon icon="mdi:car-clock" style="--mdc-icon-size: 12px;"></ha-icon>
+                <span style="font-size: 8px; font-weight: bold; margin-top: -2px;">
+                  ${Math.round(this._travelTime)}m
+                </span>
               </div>
             ` : ''}
           </div>
@@ -492,7 +660,9 @@ class PersonTrackerCard extends LitElement {
         color: white;
       }
 
-
+      .custom-field.watch-battery {
+        font-weight: 500;
+      }
 
       .entity-name {
         font-weight: 500;
@@ -536,6 +706,78 @@ class PersonTrackerCard extends LitElement {
 
       ha-icon {
         display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Compact Layout Styles */
+      .compact-grid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto auto;
+        grid-template-areas:
+          "picture name"
+          "picture location"
+          "icons icons";
+        row-gap: 1px;
+      }
+
+      .compact-picture {
+        grid-area: picture;
+        justify-self: start;
+        align-self: start;
+        margin-right: 8px;
+      }
+
+      .compact-picture img {
+        border: 3px solid var(--primary-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        object-fit: cover;
+      }
+
+      .compact-name {
+        grid-area: name;
+        justify-self: start;
+        align-self: end;
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+      }
+
+      .compact-location {
+        grid-area: location;
+        justify-self: start;
+        align-self: start;
+        font-size: 10px;
+        margin: 0;
+        padding: 0;
+        margin-bottom: 3px;
+      }
+
+      .compact-icons {
+        grid-area: icons;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 8px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-top: 3px;
+      }
+
+      .compact-icon-badge {
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
         align-items: center;
         justify-content: center;
       }
