@@ -31,79 +31,11 @@ class PersonTrackerCard extends LitElement {
     this._connectionType = 'unknown';
     this._distanceFromHome = 0;
     this._travelTime = 0;
-    this._translations = null;
   }
 
-  async _loadTranslations() {
-    if (this._translations) {
-      return this._translations;
-    }
-
-    const lang = this.hass?.language || 'en';
-    const supportedLanguages = ['en', 'it'];
-    const selectedLang = supportedLanguages.includes(lang) ? lang : 'en';
-
-    // Try multiple possible paths
-    const possiblePaths = [
-      `/hacsfiles/person-tracker-card-1/translations/${selectedLang}.json`,
-      `/local/community/person-tracker-card-1/translations/${selectedLang}.json`,
-      `./translations/${selectedLang}.json`
-    ];
-
-    for (const path of possiblePaths) {
-      try {
-        const response = await fetch(path);
-        if (response.ok) {
-          this._translations = await response.json();
-          return this._translations;
-        }
-      } catch (error) {
-        // Continue to next path
-      }
-    }
-
-    // Fallback to English if selected language not found
-    if (selectedLang !== 'en') {
-      for (const path of possiblePaths) {
-        try {
-          const englishPath = path.replace(`${selectedLang}.json`, 'en.json');
-          const response = await fetch(englishPath);
-          if (response.ok) {
-            this._translations = await response.json();
-            return this._translations;
-          }
-        } catch (error) {
-          // Continue to next path
-        }
-      }
-    }
-
-    console.error('Failed to load translations from any path');
-    return null;
-  }
-
-  _localize(path) {
-    if (!this._translations) {
-      return path;
-    }
-
-    const keys = path.split('.');
-    let value = this._translations;
-
-    for (const key of keys) {
-      if (value && typeof value === 'object' && key in value) {
-        value = value[key];
-      } else {
-        return path;
-      }
-    }
-
-    return value;
-  }
-
-  // Support for visual editor
+  // Support for the visual editor
   static async getConfigElement() {
-    // Try fixed version first, then normal version
+    // Try the fixed version first, then the standard one
     await import('./person-tracker-card-editor-fixed.js').catch(async () => {
       await import('./person-tracker-card-editor.js').catch(() => {
         console.warn('Editor not found');
@@ -114,20 +46,18 @@ class PersonTrackerCard extends LitElement {
 
   static getStubConfig() {
     return {
-      entity: 'person',  // Put only the domain, the editor will handle it
+      entity: 'person',  // Only include the domain, the editor will handle the rest
       type: 'custom:person-tracker-card'
     };
   }
 
-  async setConfig(config) {
+  setConfig(config) {
     if (!config) {
       throw new Error('Invalid configuration');
     }
     if (!config.entity) {
       throw new Error('You must define a person entity');
     }
-
-    await this._loadTranslations();
 
     // Default configuration with all new options
     this.config = {
@@ -143,19 +73,19 @@ class PersonTrackerCard extends LitElement {
       // Layout
       aspect_ratio: '1/0.7',
       triggers_update: 'all',
-      // Stili generali
+      // General styles
       name_font_size: '20px',
       state_font_size: '14px',
       card_background: 'rgba(255,255,255,0.05)',
       card_border_radius: '15px',
       picture_size: 55,
-      // Posizioni elementi
+      // Element positions
       battery_position: 'top-right',
       activity_position: 'bottom-left',
       distance_position: 'top-left',
       travel_position: 'top-left-2',
       connection_position: 'bottom-right',
-      // Dimensioni font elementi
+      // Element font sizes
       battery_font_size: '13px',
       activity_font_size: '13px',
       distance_font_size: '12px',
@@ -183,17 +113,17 @@ class PersonTrackerCard extends LitElement {
       return true;
     }
 
-    // Controlla entità principale
+    // Check the primary entity
     if (oldHass.states[this.config.entity] !== this.hass.states[this.config.entity]) {
       return true;
     }
 
-    // Se triggers_update è 'entity', aggiorna solo per l'entità principale
+    // If triggers_update is 'entity', update only for the primary entity
     if (this.config.triggers_update === 'entity') {
       return false;
     }
 
-    // Controlla entità correlate se configurate
+    // Check related entities if configured
     const relatedEntities = this._getRelatedEntities();
     for (const entityId of relatedEntities) {
       if (oldHass.states[entityId] !== this.hass.states[entityId]) {
@@ -229,7 +159,7 @@ class PersonTrackerCard extends LitElement {
       entities.push(this.config.distance_sensor || `sensor.waze_${entityBase}`);
     }
     if (this.config.show_travel_time) {
-      entities.push(this.config.travel_sensor || `sensor.casa_lavoro_${entityBase}`);
+      entities.push(this.config.travel_sensor || `sensor.home_work_${entityBase}`);
     }
 
     return entities;
@@ -238,7 +168,7 @@ class PersonTrackerCard extends LitElement {
   _updateSensorData() {
     const entityBase = this.config.entity.replace('person.', '');
 
-    // Batteria
+    // Battery
     if (this.config.show_battery) {
       const batteryEntityId = this.config.battery_sensor || `sensor.phone_${entityBase}_battery_level`;
       const batteryEntity = this.hass.states[batteryEntityId];
@@ -248,7 +178,7 @@ class PersonTrackerCard extends LitElement {
       }
     }
 
-    // Attività
+    // Activity
     if (this.config.show_activity) {
       const activityEntityId = this.config.activity_sensor || `sensor.phone_${entityBase}_activity`;
       const activityEntity = this.hass.states[activityEntityId];
@@ -257,7 +187,7 @@ class PersonTrackerCard extends LitElement {
       }
     }
 
-    // Connessione
+    // Connection
     if (this.config.show_connection) {
       const connectionEntityId = this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type`;
       const connectionEntity = this.hass.states[connectionEntityId];
@@ -266,7 +196,7 @@ class PersonTrackerCard extends LitElement {
       }
     }
 
-    // Distanza
+    // Distance
     if (this.config.show_distance) {
       const distanceEntityId = this.config.distance_sensor || `sensor.waze_${entityBase}`;
       const wazeEntity = this.hass.states[distanceEntityId];
@@ -275,9 +205,9 @@ class PersonTrackerCard extends LitElement {
       }
     }
 
-    // Tempo viaggio
+    // Travel time
     if (this.config.show_travel_time) {
-      const travelEntityId = this.config.travel_sensor || `sensor.casa_lavoro_${entityBase}`;
+      const travelEntityId = this.config.travel_sensor || `sensor.home_work_${entityBase}`;
       const travelEntity = this.hass.states[travelEntityId];
       if (travelEntity) {
         this._travelTime = parseFloat(travelEntity.state) || 0;
@@ -325,16 +255,13 @@ class PersonTrackerCard extends LitElement {
     const diffDay = Math.floor(diffHour / 24);
 
     if (diffDay > 0) {
-      const dayLabel = diffDay === 1 ? this._localize('time.day') : this._localize('time.days');
-      return `${diffDay} ${dayLabel} ${this._localize('time.ago')}`;
+      return `${diffDay} ${diffDay === 1 ? 'day' : 'days'} ago`;
     } else if (diffHour > 0) {
-      const hourLabel = diffHour === 1 ? this._localize('time.hour') : this._localize('time.hours');
-      return `${diffHour} ${hourLabel} ${this._localize('time.ago')}`;
+      return `${diffHour} ${diffHour === 1 ? 'hour' : 'hours'} ago`;
     } else if (diffMin > 0) {
-      const minLabel = diffMin === 1 ? this._localize('time.minute') : this._localize('time.minutes');
-      return `${diffMin} ${minLabel} ${this._localize('time.ago')}`;
+      return `${diffMin} ${diffMin === 1 ? 'minute' : 'minutes'} ago`;
     } else {
-      return this._localize('common.now');
+      return 'Just now';
     }
   }
 
@@ -351,7 +278,7 @@ class PersonTrackerCard extends LitElement {
     };
 
     if (!position || !(position in positions)) {
-      console.warn(`Posizione non valida "${position}" ricevuta, uso di default "top-right"`);
+      console.warn(`Invalid position "${position}" received, defaulting to "top-right"`);
       return positions['top-right'];
     }
     return positions[position];
@@ -432,7 +359,7 @@ class PersonTrackerCard extends LitElement {
                    style="font-size: ${this.config.activity_font_size};
                           ${Object.entries(activityPos).map(([k, v]) => `${k}: ${v}`).join('; ')}">
                 <ha-icon icon="${activityIcon}" .style=${'width: 16px; height: 16px;'}></ha-icon>
-                <span style="margin-left: 4px; font-size: 11px;">${this._localize('activity.' + this._activity) || this._activity}</span>
+                <span style="margin-left: 4px; font-size: 11px;">${this._activity}</span>
               </div>
             ` : ''}
 
@@ -508,7 +435,7 @@ class PersonTrackerCard extends LitElement {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto 16px auto; /* Aggiunge 16px sotto l'immagine */
+        margin: 0 auto 16px auto; /* Adds 16px below the image */
         max-width: 100%;
         max-height: 100%;
       }
@@ -630,7 +557,7 @@ class PersonTrackerCard extends LitElement {
 if (!customElements.get('person-tracker-card')) {
   customElements.define('person-tracker-card', PersonTrackerCard);
   console.info(
-    '%c PERSON-TRACKER-CARD %c v2.1 FIXED %c Complete Editor! ',
+    '%c PERSON-TRACKER-CARD %c v2.1 FIXED %c Full Editor! ',
     'background-color: #7DDA9F; color: black; font-weight: bold;',
     'background-color: #93ADCB; color: white; font-weight: bold;',
     'background-color: #FFD700; color: black; font-weight: bold;'
@@ -642,6 +569,6 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'person-tracker-card',
   name: 'Person Tracker Card',
-  description: 'Advanced card for person tracking with complete visual editor',
+  description: 'Advanced person tracking card with full visual editor',
   preview: true
 });
