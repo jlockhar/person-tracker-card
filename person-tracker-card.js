@@ -1,5 +1,5 @@
 // Person Tracker Card v2.1 - Fixed Version
-// Supporto completo per tutte le opzioni dell'editor
+// Full support for all editor options
 
 console.log("Person Tracker Card v2.1 Fixed loading...");
 
@@ -31,14 +31,82 @@ class PersonTrackerCard extends LitElement {
     this._connectionType = 'unknown';
     this._distanceFromHome = 0;
     this._travelTime = 0;
+    this._translations = null;
   }
 
-  // Supporto per l'editor visuale
+  async _loadTranslations() {
+    if (this._translations) {
+      return this._translations;
+    }
+
+    const lang = this.hass?.language || 'en';
+    const supportedLanguages = ['en', 'it'];
+    const selectedLang = supportedLanguages.includes(lang) ? lang : 'en';
+
+    // Try multiple possible paths
+    const possiblePaths = [
+      `/hacsfiles/person-tracker-card-1/translations/${selectedLang}.json`,
+      `/local/community/person-tracker-card-1/translations/${selectedLang}.json`,
+      `./translations/${selectedLang}.json`
+    ];
+
+    for (const path of possiblePaths) {
+      try {
+        const response = await fetch(path);
+        if (response.ok) {
+          this._translations = await response.json();
+          return this._translations;
+        }
+      } catch (error) {
+        // Continue to next path
+      }
+    }
+
+    // Fallback to English if selected language not found
+    if (selectedLang !== 'en') {
+      for (const path of possiblePaths) {
+        try {
+          const englishPath = path.replace(`${selectedLang}.json`, 'en.json');
+          const response = await fetch(englishPath);
+          if (response.ok) {
+            this._translations = await response.json();
+            return this._translations;
+          }
+        } catch (error) {
+          // Continue to next path
+        }
+      }
+    }
+
+    console.error('Failed to load translations from any path');
+    return null;
+  }
+
+  _localize(path) {
+    if (!this._translations) {
+      return path;
+    }
+
+    const keys = path.split('.');
+    let value = this._translations;
+
+    for (const key of keys) {
+      if (value && typeof value === 'object' && key in value) {
+        value = value[key];
+      } else {
+        return path;
+      }
+    }
+
+    return value;
+  }
+
+  // Support for visual editor
   static async getConfigElement() {
-    // Prova prima la versione fixed, poi quella normale
+    // Try fixed version first, then normal version
     await import('./person-tracker-card-editor-fixed.js').catch(async () => {
       await import('./person-tracker-card-editor.js').catch(() => {
-        console.warn('Editor non trovato');
+        console.warn('Editor not found');
       });
     });
     return document.createElement('person-tracker-card-editor');
@@ -46,22 +114,24 @@ class PersonTrackerCard extends LitElement {
 
   static getStubConfig() {
     return {
-      entity: 'person',  // Metti solo il dominio, l'editor lo gestirà
+      entity: 'person',  // Put only the domain, the editor will handle it
       type: 'custom:person-tracker-card'
     };
   }
 
-  setConfig(config) {
+  async setConfig(config) {
     if (!config) {
-      throw new Error('Configurazione non valida');
+      throw new Error('Invalid configuration');
     }
     if (!config.entity) {
-      throw new Error('Devi definire un\'entità person');
+      throw new Error('You must define a person entity');
     }
 
-    // Configurazione predefinita con tutte le nuove opzioni
+    await this._loadTranslations();
+
+    // Default configuration with all new options
     this.config = {
-      // Visualizzazione
+      // Display
       show_entity_picture: true,
       show_name: true,
       show_last_changed: true,
@@ -255,13 +325,16 @@ class PersonTrackerCard extends LitElement {
     const diffDay = Math.floor(diffHour / 24);
 
     if (diffDay > 0) {
-      return `${diffDay} ${diffDay === 1 ? 'giorno' : 'giorni'} fa`;
+      const dayLabel = diffDay === 1 ? this._localize('time.day') : this._localize('time.days');
+      return `${diffDay} ${dayLabel} ${this._localize('time.ago')}`;
     } else if (diffHour > 0) {
-      return `${diffHour} ${diffHour === 1 ? 'ora' : 'ore'} fa`;
+      const hourLabel = diffHour === 1 ? this._localize('time.hour') : this._localize('time.hours');
+      return `${diffHour} ${hourLabel} ${this._localize('time.ago')}`;
     } else if (diffMin > 0) {
-      return `${diffMin} ${diffMin === 1 ? 'minuto' : 'minuti'} fa`;
+      const minLabel = diffMin === 1 ? this._localize('time.minute') : this._localize('time.minutes');
+      return `${diffMin} ${minLabel} ${this._localize('time.ago')}`;
     } else {
-      return 'Adesso';
+      return this._localize('common.now');
     }
   }
 
@@ -359,7 +432,7 @@ class PersonTrackerCard extends LitElement {
                    style="font-size: ${this.config.activity_font_size};
                           ${Object.entries(activityPos).map(([k, v]) => `${k}: ${v}`).join('; ')}">
                 <ha-icon icon="${activityIcon}" .style=${'width: 16px; height: 16px;'}></ha-icon>
-                <span style="margin-left: 4px; font-size: 11px;">${this._activity}</span>
+                <span style="margin-left: 4px; font-size: 11px;">${this._localize('activity.' + this._activity) || this._activity}</span>
               </div>
             ` : ''}
 
@@ -553,22 +626,22 @@ class PersonTrackerCard extends LitElement {
   }
 }
 
-// Registrazione della card
+// Card registration
 if (!customElements.get('person-tracker-card')) {
   customElements.define('person-tracker-card', PersonTrackerCard);
   console.info(
-    '%c PERSON-TRACKER-CARD %c v2.1 FIXED %c Editor Completo! ',
+    '%c PERSON-TRACKER-CARD %c v2.1 FIXED %c Complete Editor! ',
     'background-color: #7DDA9F; color: black; font-weight: bold;',
     'background-color: #93ADCB; color: white; font-weight: bold;',
     'background-color: #FFD700; color: black; font-weight: bold;'
   );
 }
 
-// Aggiungi info per Lovelace
+// Add info for Lovelace
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'person-tracker-card',
   name: 'Person Tracker Card',
-  description: 'Card avanzata per tracking persone con editor visuale completo',
+  description: 'Advanced card for person tracking with complete visual editor',
   preview: true
 });
