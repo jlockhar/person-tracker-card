@@ -31,6 +31,74 @@ class PersonTrackerCard extends LitElement {
     this._connectionType = 'unknown';
     this._distanceFromHome = 0;
     this._travelTime = 0;
+    this._translations = null;
+  }
+
+  async _loadTranslations() {
+    if (this._translations) {
+      return this._translations;
+    }
+
+    const lang = this.hass?.language || 'en';
+    const supportedLanguages = ['en', 'it'];
+    const selectedLang = supportedLanguages.includes(lang) ? lang : 'en';
+
+    // Try multiple possible paths
+    const possiblePaths = [
+      `/hacsfiles/person-tracker-card-1/translations/${selectedLang}.json`,
+      `/local/community/person-tracker-card-1/translations/${selectedLang}.json`,
+      `./translations/${selectedLang}.json`
+    ];
+
+    for (const path of possiblePaths) {
+      try {
+        const response = await fetch(path);
+        if (response.ok) {
+          this._translations = await response.json();
+          return this._translations;
+        }
+      } catch (error) {
+        // Continue to next path
+      }
+    }
+
+    // Fallback to English if selected language not found
+    if (selectedLang !== 'en') {
+      for (const path of possiblePaths) {
+        try {
+          const englishPath = path.replace(`${selectedLang}.json`, 'en.json');
+          const response = await fetch(englishPath);
+          if (response.ok) {
+            this._translations = await response.json();
+            return this._translations;
+          }
+        } catch (error) {
+          // Continue to next path
+        }
+      }
+    }
+
+    console.error('Failed to load translations from any path');
+    return null;
+  }
+
+  _localize(path) {
+    if (!this._translations) {
+      return path;
+    }
+
+    const keys = path.split('.');
+    let value = this._translations;
+
+    for (const key of keys) {
+      if (value && typeof value === 'object' && key in value) {
+        value = value[key];
+      } else {
+        return path;
+      }
+    }
+
+    return value;
   }
 
   // Supporto per l'editor visuale
@@ -51,13 +119,15 @@ class PersonTrackerCard extends LitElement {
     };
   }
 
-  setConfig(config) {
+  async setConfig(config) {
     if (!config) {
-      throw new Error('Configurazione non valida');
+      throw new Error('Invalid configuration');
     }
     if (!config.entity) {
-      throw new Error('Devi definire un\'entità person');
+      throw new Error('You must define a person entity');
     }
+
+    await this._loadTranslations();
 
     // Configurazione predefinita con tutte le nuove opzioni
     this.config = {
@@ -255,13 +325,16 @@ class PersonTrackerCard extends LitElement {
     const diffDay = Math.floor(diffHour / 24);
 
     if (diffDay > 0) {
-      return `${diffDay} ${diffDay === 1 ? 'giorno' : 'giorni'} fa`;
+      const dayLabel = diffDay === 1 ? this._localize('time.day') : this._localize('time.days');
+      return `${diffDay} ${dayLabel} ${this._localize('time.ago')}`;
     } else if (diffHour > 0) {
-      return `${diffHour} ${diffHour === 1 ? 'ora' : 'ore'} fa`;
+      const hourLabel = diffHour === 1 ? this._localize('time.hour') : this._localize('time.hours');
+      return `${diffHour} ${hourLabel} ${this._localize('time.ago')}`;
     } else if (diffMin > 0) {
-      return `${diffMin} ${diffMin === 1 ? 'minuto' : 'minuti'} fa`;
+      const minLabel = diffMin === 1 ? this._localize('time.minute') : this._localize('time.minutes');
+      return `${diffMin} ${minLabel} ${this._localize('time.ago')}`;
     } else {
-      return 'Adesso';
+      return this._localize('common.now');
     }
   }
 

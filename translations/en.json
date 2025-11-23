@@ -1,0 +1,104 @@
+{
+  "common": {
+    "invalid_configuration": "Invalid configuration",
+    "entity_required": "You must define a person entity",
+    "editor_not_found": "Editor not found",
+    "now": "Now"
+  },
+  "time": {
+    "day": "day",
+    "days": "days",
+    "hour": "hour",
+    "hours": "hours",
+    "minute": "minute",
+    "minutes": "minutes",
+    "ago": "ago"
+  },
+  "activity": {
+    "Walking": "Walking",
+    "Running": "Running",
+    "Automotive": "Automotive",
+    "Stationary": "Stationary",
+    "Cycling": "Cycling",
+    "Still": "Still",
+    "Unknown": "Unknown"
+  },
+  "connection": {
+    "wifi": "Wi-Fi",
+    "cellular": "Cellular"
+  },
+  "editor": {
+    "tabs": {
+      "base": "Base",
+      "sensors": "Sensors",
+      "states": "States",
+      "style": "Style"
+    },
+    "sections": {
+      "base_configuration": "Base Configuration",
+      "display_options": "Display Options",
+      "automatic_sensors": "Automatic Sensors",
+      "custom_states": "Custom States",
+      "style_customization": "Style Customization"
+    },
+    "labels": {
+      "person_entity": "Person Entity (required)",
+      "custom_name": "Custom name (optional)",
+      "custom_image": "Custom image URL",
+      "aspect_ratio": "Aspect ratio",
+      "show_entity_picture": "Show person image",
+      "show_name": "Show name",
+      "show_last_changed": "Show last updated",
+      "battery": "Battery",
+      "activity": "Activity",
+      "connection": "Connection",
+      "distance": "Distance from Home",
+      "travel_time": "Travel Time",
+      "battery_sensor": "Battery sensor",
+      "activity_sensor": "Activity sensor",
+      "connection_sensor": "Connection sensor",
+      "distance_sensor": "Distance sensor",
+      "travel_sensor": "Travel time sensor",
+      "battery_position": "Battery position",
+      "activity_position": "Activity position",
+      "connection_position": "Connection position",
+      "distance_position": "Distance position",
+      "travel_position": "Travel time position",
+      "state_value": "State value (e.g., home, not_home)",
+      "display_name": "Display name",
+      "custom_image_optional": "Custom image (optional)",
+      "name_color": "Name color",
+      "name_font": "Name font",
+      "state_font": "State font",
+      "card_background": "Card background",
+      "border_radius": "Border radius",
+      "picture_size": "Picture size (%)"
+    },
+    "positions": {
+      "top_left": "Top Left",
+      "top_right": "Top Right",
+      "bottom_left": "Bottom Left",
+      "bottom_right": "Bottom Right"
+    },
+    "buttons": {
+      "add_state": "Add State",
+      "add_default_states": "Add Default States",
+      "remove": "Remove"
+    },
+    "info": {
+      "sensor_pattern": "Sensors are automatically detected based on the selected person entity. Standard pattern: sensor.phone_{entity}_*",
+      "aspect_ratio_format": "Format: width/height (e.g., 1/0.7)",
+      "image_url_example": "E.g., /local/photos/mario.jpg",
+      "background_example": "E.g., rgba(255,255,255,0.05) or #1a1a2e",
+      "custom_states_info": "Configure how different person states are displayed",
+      "default_states": "Default States"
+    },
+    "states": {
+      "new_state": "New state",
+      "home": "🏡 Home",
+      "not_home": "🏃‍♂️ Away",
+      "office": "🏢 Office",
+      "unknown": "❓ Unknown"
+    }
+  }
+}

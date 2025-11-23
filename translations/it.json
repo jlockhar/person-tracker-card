@@ -1,0 +1,104 @@
+{
+  "common": {
+    "invalid_configuration": "Configurazione non valida",
+    "entity_required": "Devi definire un'entità person",
+    "editor_not_found": "Editor non trovato",
+    "now": "Adesso"
+  },
+  "time": {
+    "day": "giorno",
+    "days": "giorni",
+    "hour": "ora",
+    "hours": "ore",
+    "minute": "minuto",
+    "minutes": "minuti",
+    "ago": "fa"
+  },
+  "activity": {
+    "Walking": "Camminando",
+    "Running": "Correndo",
+    "Automotive": "In Auto",
+    "Stationary": "Fermo",
+    "Cycling": "In Bici",
+    "Still": "Immobile",
+    "Unknown": "Sconosciuto"
+  },
+  "connection": {
+    "wifi": "Wi-Fi",
+    "cellular": "Cellulare"
+  },
+  "editor": {
+    "tabs": {
+      "base": "Base",
+      "sensors": "Sensori",
+      "states": "Stati",
+      "style": "Stile"
+    },
+    "sections": {
+      "base_configuration": "Configurazione Base",
+      "display_options": "Opzioni di Visualizzazione",
+      "automatic_sensors": "Sensori Automatici",
+      "custom_states": "Stati Personalizzati",
+      "style_customization": "Personalizzazione Stile Card"
+    },
+    "labels": {
+      "person_entity": "Entità Persona (richiesto)",
+      "custom_name": "Nome personalizzato (opzionale)",
+      "custom_image": "URL immagine personalizzata",
+      "aspect_ratio": "Rapporto aspetto",
+      "show_entity_picture": "Mostra immagine persona",
+      "show_name": "Mostra nome",
+      "show_last_changed": "Mostra ultimo aggiornamento",
+      "battery": "Batteria",
+      "activity": "Attività",
+      "connection": "Connessione",
+      "distance": "Distanza da Casa",
+      "travel_time": "Tempo di Viaggio",
+      "battery_sensor": "Sensore batteria",
+      "activity_sensor": "Sensore attività",
+      "connection_sensor": "Sensore connessione",
+      "distance_sensor": "Sensore distanza",
+      "travel_sensor": "Sensore tempo viaggio",
+      "battery_position": "Posizione batteria",
+      "activity_position": "Posizione attività",
+      "connection_position": "Posizione connessione",
+      "distance_position": "Posizione distanza",
+      "travel_position": "Posizione tempo viaggio",
+      "state_value": "Valore stato (es: home, not_home)",
+      "display_name": "Nome visualizzato",
+      "custom_image_optional": "Immagine personalizzata (opzionale)",
+      "name_color": "Colore nome",
+      "name_font": "Font nome",
+      "state_font": "Font stato",
+      "card_background": "Background card",
+      "border_radius": "Border radius",
+      "picture_size": "Dimensione immagine (%)"
+    },
+    "positions": {
+      "top_left": "Alto Sinistra",
+      "top_right": "Alto Destra",
+      "bottom_left": "Basso Sinistra",
+      "bottom_right": "Basso Destra"
+    },
+    "buttons": {
+      "add_state": "Aggiungi Stato",
+      "add_default_states": "Aggiungi Stati Predefiniti",
+      "remove": "Rimuovi"
+    },
+    "info": {
+      "sensor_pattern": "I sensori vengono rilevati automaticamente in base all'entità persona selezionata. Pattern standard: sensor.phone_{entity}_*",
+      "aspect_ratio_format": "Formato: larghezza/altezza (es: 1/0.7)",
+      "image_url_example": "Es: /local/foto/mario.jpg",
+      "background_example": "Es: rgba(255,255,255,0.05) o #1a1a2e",
+      "custom_states_info": "Configura come vengono visualizzati i diversi stati della persona",
+      "default_states": "Stati Predefiniti"
+    },
+    "states": {
+      "new_state": "Nuovo stato",
+      "home": "🏡 Casa",
+      "not_home": "🏃‍♂️ Fuori Casa",
+      "office": "🏢 Ufficio",
+      "unknown": "❓ Sconosciuto"
+    }
+  }
+}
