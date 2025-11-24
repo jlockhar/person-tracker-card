@@ -1,13 +1,176 @@
-// Person Tracker Card v2.1 - Fixed Version
+// Person Tracker Card v2.2 - Multilanguage Version
 // Full support for all editor options
+// Languages: Italian (default), English, French, German
 
-console.log("Person Tracker Card v2.1 Fixed loading...");
+console.log("Person Tracker Card v2.2 Multilanguage loading...");
 
 const LitElement = Object.getPrototypeOf(
   customElements.get("ha-panel-lovelace") || customElements.get("hui-view")
 );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
+
+// Localization Helper Class
+class LocalizationHelper {
+  constructor(hass) {
+    this.hass = hass;
+    this.translations = {};
+    this.currentLanguage = 'en'; // Default: English
+    this.loadTranslations();
+  }
+
+  loadTranslations() {
+    // Get language from Home Assistant
+    const haLanguage = this.hass?.language || this.hass?.locale?.language || 'en';
+    
+    // Map HA language codes to our supported languages
+    const languageMap = {
+      'it': 'it',
+      'it-IT': 'it',
+      'en': 'en',
+      'en-US': 'en',
+      'en-GB': 'en',
+      'fr': 'fr',
+      'fr-FR': 'fr',
+      'de': 'de',
+      'de-DE': 'de'
+    };
+
+    this.currentLanguage = languageMap[haLanguage] || 'en';
+
+    // Translations embedded (fallback if files are not loaded)
+    this.translations = {
+      'it': {
+        'common.person_tracker': 'Tracciatore Persona',
+        'common.unknown': 'Sconosciuto',
+        'common.home': 'Casa',
+        'common.away': 'Fuori',
+        'common.not_home': 'Non a Casa',
+        'attributes.battery': 'Batteria',
+        'attributes.speed': 'Velocità',
+        'attributes.direction': 'Direzione',
+        'attributes.accuracy': 'Precisione',
+        'attributes.gps_accuracy': 'Precisione GPS',
+        'attributes.altitude': 'Altitudine',
+        'attributes.source': 'Fonte',
+        'attributes.last_changed': 'Ultimo aggiornamento',
+        'attributes.distance': 'Distanza',
+        'units.km': 'km',
+        'units.m': 'm',
+        'units.km_h': 'km/h',
+        'units.percent': '%',
+        'time.just_now': 'Proprio ora',
+        'time.minute': 'minuto',
+        'time.minutes': 'minuti',
+        'time.hour': 'ora',
+        'time.hours': 'ore',
+        'time.day': 'giorno',
+        'time.days': 'giorni',
+        'time.ago': 'fa'
+      },
+      'en': {
+        'common.person_tracker': 'Person Tracker',
+        'common.unknown': 'Unknown',
+        'common.home': 'Home',
+        'common.away': 'Away',
+        'common.not_home': 'Not Home',
+        'attributes.battery': 'Battery',
+        'attributes.speed': 'Speed',
+        'attributes.direction': 'Direction',
+        'attributes.accuracy': 'Accuracy',
+        'attributes.gps_accuracy': 'GPS Accuracy',
+        'attributes.altitude': 'Altitude',
+        'attributes.source': 'Source',
+        'attributes.last_changed': 'Last Changed',
+        'attributes.distance': 'Distance',
+        'units.km': 'km',
+        'units.m': 'm',
+        'units.km_h': 'km/h',
+        'units.percent': '%',
+        'time.just_now': 'Just now',
+        'time.minute': 'minute',
+        'time.minutes': 'minutes',
+        'time.hour': 'hour',
+        'time.hours': 'hours',
+        'time.day': 'day',
+        'time.days': 'days',
+        'time.ago': 'ago'
+      },
+      'fr': {
+        'common.person_tracker': 'Suivi de Personne',
+        'common.unknown': 'Inconnu',
+        'common.home': 'Maison',
+        'common.away': 'Absent',
+        'common.not_home': 'Pas à la Maison',
+        'attributes.battery': 'Batterie',
+        'attributes.speed': 'Vitesse',
+        'attributes.direction': 'Direction',
+        'attributes.accuracy': 'Précision',
+        'attributes.gps_accuracy': 'Précision GPS',
+        'attributes.altitude': 'Altitude',
+        'attributes.source': 'Source',
+        'attributes.last_changed': 'Dernière Mise à Jour',
+        'attributes.distance': 'Distance',
+        'units.km': 'km',
+        'units.m': 'm',
+        'units.km_h': 'km/h',
+        'units.percent': '%',
+        'time.just_now': 'À l\'instant',
+        'time.minute': 'minute',
+        'time.minutes': 'minutes',
+        'time.hour': 'heure',
+        'time.hours': 'heures',
+        'time.day': 'jour',
+        'time.days': 'jours',
+        'time.ago': 'il y a'
+      },
+      'de': {
+        'common.person_tracker': 'Personen-Tracker',
+        'common.unknown': 'Unbekannt',
+        'common.home': 'Zuhause',
+        'common.away': 'Abwesend',
+        'common.not_home': 'Nicht Zuhause',
+        'attributes.battery': 'Batterie',
+        'attributes.speed': 'Geschwindigkeit',
+        'attributes.direction': 'Richtung',
+        'attributes.accuracy': 'Genauigkeit',
+        'attributes.gps_accuracy': 'GPS-Genauigkeit',
+        'attributes.altitude': 'Höhe',
+        'attributes.source': 'Quelle',
+        'attributes.last_changed': 'Letzte Änderung',
+        'attributes.distance': 'Entfernung',
+        'units.km': 'km',
+        'units.m': 'm',
+        'units.km_h': 'km/h',
+        'units.percent': '%',
+        'time.just_now': 'Gerade eben',
+        'time.minute': 'Minute',
+        'time.minutes': 'Minuten',
+        'time.hour': 'Stunde',
+        'time.hours': 'Stunden',
+        'time.day': 'Tag',
+        'time.days': 'Tage',
+        'time.ago': 'vor'
+      }
+    };
+  }
+
+  localize(key) {
+    const langTranslations = this.translations[this.currentLanguage];
+    if (langTranslations && langTranslations[key]) {
+      return langTranslations[key];
+    }
+    
+    // Fallback to English
+    const defaultTranslations = this.translations['en'];
+    if (defaultTranslations && defaultTranslations[key]) {
+      return defaultTranslations[key];
+    }
+    
+    // Fallback to key itself
+    return key;
+  }
+}
 
 class PersonTrackerCard extends LitElement {
   static get properties() {
@@ -35,6 +198,35 @@ class PersonTrackerCard extends LitElement {
     this._watchBatteryLevel = 0;
     this._watchBatteryIcon = 'mdi:battery';
     this._travelTime = 0;
+    this._localize = null;
+  }
+
+  // Initialize localization when hass is available
+  _initLocalization() {
+    if (this.hass && !this._localize) {
+      this._localize = new LocalizationHelper(this.hass);
+    }
+  }
+
+  // Helper method to get localized strings
+  _t(key) {
+    this._initLocalization();
+    return this._localize ? this._localize.localize(key) : key;
+  }
+
+  // Translate common entity states
+  _translateState(state) {
+    if (!state) return this._t('common.unknown');
+    
+    const stateMap = {
+      'home': 'common.home',
+      'not_home': 'common.not_home',
+      'away': 'common.away',
+      'unknown': 'common.unknown'
+    };
+
+    const lowerState = state.toLowerCase();
+    return stateMap[lowerState] ? this._t(stateMap[lowerState]) : state;
   }
 
   // Support for the visual editor
@@ -290,13 +482,16 @@ class PersonTrackerCard extends LitElement {
     const diffDay = Math.floor(diffHour / 24);
 
     if (diffDay > 0) {
-      return `${diffDay} ${diffDay === 1 ? 'day' : 'days'} ago`;
+      const unit = diffDay === 1 ? this._t('time.day') : this._t('time.days');
+      return `${diffDay} ${unit} ${this._t('time.ago')}`;
     } else if (diffHour > 0) {
-      return `${diffHour} ${diffHour === 1 ? 'hour' : 'hours'} ago`;
+      const unit = diffHour === 1 ? this._t('time.hour') : this._t('time.hours');
+      return `${diffHour} ${unit} ${this._t('time.ago')}`;
     } else if (diffMin > 0) {
-      return `${diffMin} ${diffMin === 1 ? 'minute' : 'minutes'} ago`;
+      const unit = diffMin === 1 ? this._t('time.minute') : this._t('time.minutes');
+      return `${diffMin} ${unit} ${this._t('time.ago')}`;
     } else {
-      return 'Just now';
+      return this._t('time.just_now');
     }
   }
 
@@ -350,7 +545,7 @@ class PersonTrackerCard extends LitElement {
 
 
     const stateConfig = this._getCurrentStateConfig();
-    const stateName = stateConfig?.name || this.config.name || entity.state;
+    const stateName = stateConfig?.name || this.config.name || this._translateState(entity.state);
     const entityPicture = stateConfig?.entity_picture || this.config.entity_picture || entity.attributes?.entity_picture;
     const isCustomImage = !!this.config.entity_picture;
 
@@ -436,7 +631,7 @@ class PersonTrackerCard extends LitElement {
                    style="font-size: ${this.config.distance_font_size};
                           ${Object.entries(distancePos).map(([k, v]) => `${k}: ${v}`).join('; ')}">
                 <ha-icon icon="mdi:home" .style=${'width: 16px; height: 16px;'}></ha-icon>
-                <span>${Math.round(this._distanceFromHome)} km</span>
+                <span>${Math.round(this._distanceFromHome)} ${this._t('units.km')}</span>
               </div>
             ` : ''}
 
@@ -470,7 +665,7 @@ class PersonTrackerCard extends LitElement {
     const personName = this.config.name || entity.attributes?.friendly_name || 'Person';
     
     // Nome dello stato personalizzato (location)
-    const displayLocation = stateConfig?.name || entity.state;
+    const displayLocation = stateConfig?.name || this._translateState(entity.state);
     
     const entityPicture = stateConfig?.entity_picture || this.config.entity_picture || entity.attributes?.entity_picture;
     const stateStyles = stateConfig?.styles?.name || {};
