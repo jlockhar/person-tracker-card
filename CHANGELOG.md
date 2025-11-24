@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2024-11-24
+## [1.1.1] - 2024-11-24
 
 ### Added - Multilanguage Support 🌍
 - 🌍 **Complete Multilanguage System** - Full internationalization support
@@ -99,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Features Summary
 
-### Multilanguage Support (v2.0.0) 🌍
+### Multilanguage Support (v1.1.1) 🌍
 - 4 complete language translations
 - Automatic detection from Home Assistant
 - English fallback for unsupported languages
@@ -128,10 +128,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Language | Code | Status | Version |
 |----------|------|--------|---------|
-| 🇬🇧 English | en | ✅ Complete | 2.0.0 |
-| 🇮🇹 Italiano | it | ✅ Complete | 2.0.0 |
-| 🇫🇷 Français | fr | ✅ Complete | 2.0.0 |
-| 🇩🇪 Deutsch | de | ✅ Complete | 2.0.0 |
+| 🇬🇧 English | en | ✅ Complete | 1.1.1 |
+| 🇮🇹 Italiano | it | ✅ Complete | 1.1.1 |
+| 🇫🇷 Français | fr | ✅ Complete | 1.1.1 |
+| 🇩🇪 Deutsch | de | ✅ Complete | 1.1.1 |
 
 ---
 
@@ -146,6 +146,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Version Links
-- [2.0.0]: https://github.com/djdevil/person-tracker-card/releases/tag/v2.0.0
+- [2.0.0]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.1.1
 - [1.1.0]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.1.0
 - [1.0.0]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.0.0
