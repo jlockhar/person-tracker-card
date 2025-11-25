@@ -417,13 +417,7 @@ class PersonTrackerCard extends LitElement {
       const activityEntity = this.hass.states[activityEntityId];
       if (activityEntity) {
         this._activity = activityEntity.state;
-        // Legge l'icona dall'attributo icon dell'entità, se non presente usa il mapping hardcoded
-        if (activityEntity.attributes?.icon) {
-          this._activityIcon = activityEntity.attributes.icon;
-        } else {
-          // Fallback alle icone predefinite
-          this._activityIcon = this._getActivityIcon();
-        }
+        this._activityIcon = this._getActivityIcon(); 
       }
     }
 
@@ -474,7 +468,7 @@ class PersonTrackerCard extends LitElement {
       'walking': 'mdi:walk',
       'running': 'mdi:run'
     };
-    return icons[this._activity] || '';
+    return icons[this._activity] || 'mdi:human-male';
   }
 
   _getBatteryColor(level) {
