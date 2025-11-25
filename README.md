@@ -16,8 +16,8 @@ Advanced card for Home Assistant that displays detailed information about people
 
 ---
 
-[![HACS Repository](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=djdevil&repository=person-tracker-card&category=dashboard)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=djdevil&repository=person-tracker-card&category=dashboard)
 
 <a name="english-version"></a>
 ## 📑 Table of Contents
