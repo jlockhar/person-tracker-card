@@ -1,16 +1,19 @@
 # 👤 Person Tracker Card for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/djdevil/person-tracker-card)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/djdevil/person-tracker-card)
 
 
-Advanced card for Home Assistant that displays detailed information about people with complete visual editor and two layout modes.
+Advanced card for Home Assistant that displays detailed information about people with complete visual editor and three layout modes.
 
 ## 📑 Classic Layout
 ![Person Tracker Card](images/preview.png)
 
 ## 📑 Compact Layout
 ![Person Tracker Card](images/compact2.png)
+
+## 📑 Modern Layout 🆕
+![Person Tracker Card](images/modern.png)
 
 **[🇬🇧 English](#english-version) | [🇮🇹 Versione Italiana](#versione-italiana)**
 
@@ -34,9 +37,10 @@ Advanced card for Home Assistant that displays detailed information about people
 
 ## ✨ Key Features
 
-- 🎨 **Two Layout Modes**
+- 🎨 **Three Layout Modes**
   - **Classic**: Fully customizable with positionable elements
   - **Compact**: Space-efficient horizontal grid layout
+  - **Modern**: Sleek design with circular progress indicators 🆕
 - 📱 **Battery Monitoring** - Phone battery with dynamic icon and color
 - ⌚ **Watch Battery** - Apple Watch and smartwatch support
 - 🚶 **Activity Tracking** - Walking, Running, Automotive, Stationary, Cycling
@@ -97,11 +101,47 @@ compact_width: 300  # 200-500px
 └────────────────────────────┘
 ```
 
+### Modern Layout 🆕
+Sleek horizontal design with circular progress indicators.
+
+**Perfect for:**
+- Modern, minimal dashboards
+- Visual battery/distance representation
+- Clean and elegant interfaces
+- Auto-expanding responsive cards
+
+```yaml
+type: custom:person-tracker-card
+entity: person.davide
+layout: modern
+modern_picture_size: 45
+modern_name_font_size: '16px'
+modern_state_font_size: '13px'
+```
+
+**Layout structure:**
+```
+┌──────────────────────────────────────────────┐
+│  ┌───┐                                       │
+│  │🖼️│  PERSON NAME    ⭕ ⭕ 🚶 📶 ⭕ ⭕  │
+│  └───┘  📍 Location    📱 ⌚ 🏃 📡 🏠 🚗  │
+└──────────────────────────────────────────────┘
+     ▲         ▲                    ▲
+   Photo    Name/State      Circular Indicators
+  (colored                  (Battery, Watch,
+   border)                   Distance, Travel)
+```
+
+**Modern Layout Features:**
+- 🔵 **Circular Progress Rings** - Visual representation of battery %, distance, travel time
+- 🟢 **State-Colored Border** - Picture border changes based on state (green=home, red=away, orange=other)
+- 🎯 **Icon Badges** - Activity and connection shown as icon circles
+- 📐 **Auto-Expanding** - Card width adapts to number of visible indicators
+- 🎨 **Customizable Fonts** - Separate font sizes for name and state
+
 ---
 
 ## 📦 Installation
-
-## Install
 
 ### Installation via HACS (Recommended)
 
@@ -137,7 +177,7 @@ Have [HACS](https://hacs.xyz/) installed, this will allow you to update easily.
 1. Edit dashboard → Add card
 2. Search **Person Tracker Card**
 3. Select **person** entity
-4. Choose **layout** (classic/compact)
+4. Choose **layout** (classic/compact/modern)
 5. Configure sensors and style
 
 ### Basic YAML
@@ -145,7 +185,62 @@ Have [HACS](https://hacs.xyz/) installed, this will allow you to update easily.
 ```yaml
 type: custom:person-tracker-card
 entity: person.davide
-layout: compact  # or 'classic'
+layout: modern  # or 'classic' or 'compact'
+```
+
+### Modern Layout Configuration 🆕
+
+```yaml
+type: custom:person-tracker-card
+entity: person.davide
+layout: modern
+
+# Display options
+show_entity_picture: true
+show_person_name: true
+show_name: true
+show_battery: true
+show_watch_battery: true
+show_activity: true
+show_connection: true
+show_distance: true
+show_travel_time: true
+
+# Modern layout specific
+modern_picture_size: 45           # Picture size in px (30-80)
+modern_name_font_size: '16px'     # Name font size
+modern_state_font_size: '13px'    # State/location font size
+modern_travel_max_time: 60        # Max travel time for ring calculation
+
+# Custom sensors (optional)
+battery_sensor: sensor.phone_davide_battery_level
+watch_battery_sensor: sensor.watch_davide_battery_level
+activity_sensor: sensor.phone_davide_activity
+connection_sensor: sensor.phone_davide_connection_type
+distance_sensor: sensor.waze_davide
+travel_sensor: sensor.waze_davide
+
+# Styling
+card_background: 'rgba(255,255,255,0.05)'
+card_border_radius: '15px'
+
+# Custom states with colors (border color follows state)
+state:
+  - value: home
+    name: 🏡 Home
+    styles:
+      name:
+        color: '#50A14F'
+  - value: not_home
+    name: 🚗 Away
+    styles:
+      name:
+        color: '#e45649'
+  - value: work
+    name: 🏢 Office
+    styles:
+      name:
+        color: '#ffa229'
 ```
 
 ### Compact Layout Configuration
@@ -294,6 +389,46 @@ For distance tracking:
 
 ## 🎭 Examples
 
+### Modern Layout - Family Dashboard 🆕
+
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:person-tracker-card
+    entity: person.davide
+    layout: modern
+    modern_picture_size: 50
+    modern_name_font_size: '16px'
+    state:
+      - value: home
+        name: 🏡 Casa
+        styles:
+          name:
+            color: '#50A14F'
+      - value: not_home
+        name: 🚗 Fuori
+        styles:
+          name:
+            color: '#e45649'
+    
+  - type: custom:person-tracker-card
+    entity: person.nunzia
+    layout: modern
+    modern_picture_size: 50
+    modern_name_font_size: '16px'
+    state:
+      - value: home
+        name: 🏡 Casa
+        styles:
+          name:
+            color: '#50A14F'
+      - value: not_home
+        name: 🚗 Fuori
+        styles:
+          name:
+            color: '#e45649'
+```
+
 ### Compact Grid - Multiple People
 
 ```yaml
@@ -328,13 +463,11 @@ type: vertical-stack
 cards:
   - type: custom:person-tracker-card
     entity: person.davide
-    layout: compact
-    compact_width: 250
+    layout: modern
     
   - type: custom:person-tracker-card
     entity: person.nunzia
-    layout: compact
-    compact_width: 250
+    layout: modern
 ```
 
 ### Mixed Layout
@@ -351,26 +484,24 @@ cards:
     cards:
       - type: custom:person-tracker-card
         entity: person.child1
-        layout: compact
-        compact_width: 240
+        layout: modern
         
       - type: custom:person-tracker-card
         entity: person.child2
-        layout: compact
-        compact_width: 240
+        layout: modern
 ```
 
-### Minimal Compact (Sidebar)
+### Minimal Modern (Sidebar)
 
 ```yaml
 type: custom:person-tracker-card
 entity: person.davide
-layout: compact
-compact_width: 200
-show_last_changed: false
+layout: modern
 show_watch_battery: false
 show_travel_time: false
 show_distance: false
+show_activity: false
+show_connection: false
 ```
 
 ---
@@ -398,22 +529,41 @@ show_distance: false
 - Restart Home Assistant
 
 ### Layout doesn't change
-- Verify `layout: 'compact'` or `layout: 'classic'`
+- Verify `layout: 'modern'` or `layout: 'compact'` or `layout: 'classic'`
 - Values are case-sensitive
 - Clear cache and reload
+
+### Modern layout rings overlap text
+- Update to latest version (v1.2.0+)
+- Card now auto-expands based on indicators
 
 ---
 
 ## 📝 Changelog
 
+### v1.2.0 (2025-05-30) 🆕
+- ✨ **New Modern Layout** with circular progress indicators
+- 🔵 Circular SVG rings for battery, watch, distance, travel time
+- 🟢 State-colored picture border (green/red/orange)
+- 🎯 Icon badges for activity and connection
+- ⚙️ Customizable font sizes for Modern layout
+- 📐 Auto-expanding responsive design
+- 🎨 Improved activity icon mapping with entity attribute support
+
+### v1.1.2 (2025-01-25)
+- 📏 Dynamic distance unit from entity attributes
+- 🎯 Dynamic activity icon from entity attributes
+- 🔤 State and last changed font customization
+- 🤖 Fixed Android WiFi detection
+
+### v1.1.1 (2024-11-24)
+- 🌍 Complete multilanguage support (EN, IT, FR, DE)
+- 🔄 Automatic language detection from Home Assistant
+
 ### v1.1.0 (2024-11-23)
 - ✨ New compact layout mode
 - 📏 Configurable width for compact layout (200-500px)
 - ⌚ Watch battery support
-- 🎨 Separate Position tab in editor
-- 📐 Conditional UI based on selected layout
-- 🐛 Fixed: Person name disappears with custom states in compact layout
-- 🎨 Hidden irrelevant style fields in compact mode
 
 ### v1.0.0 (2024-11-22)
 - 🎉 Initial public release
@@ -474,9 +624,10 @@ If you find this card useful:
 
 ## ✨ Caratteristiche Principali
 
-- 🎨 **Due Modalità di Layout**
+- 🎨 **Tre Modalità di Layout**
   - **Classic**: Completamente personalizzabile con elementi posizionabili
   - **Compact**: Layout a griglia orizzontale per risparmiare spazio
+  - **Modern**: Design elegante con indicatori circolari di progresso 🆕
 - 📱 **Monitoraggio Batteria** - Batteria telefono con icona e colore dinamici
 - ⌚ **Batteria Smartwatch** - Supporto Apple Watch e altri smartwatch
 - 🚶 **Tracciamento Attività** - Walking, Running, Automotive, Stationary, Cycling
@@ -537,6 +688,44 @@ compact_width: 300  # 200-500px
 └────────────────────────────┘
 ```
 
+### Layout Modern 🆕
+Design orizzontale elegante con indicatori circolari di progresso.
+
+**Perfetto per:**
+- Dashboard moderne e minimali
+- Rappresentazione visiva batteria/distanza
+- Interfacce pulite ed eleganti
+- Card responsive che si espandono automaticamente
+
+```yaml
+type: custom:person-tracker-card
+entity: person.davide
+layout: modern
+modern_picture_size: 45
+modern_name_font_size: '16px'
+modern_state_font_size: '13px'
+```
+
+**Struttura layout:**
+```
+┌──────────────────────────────────────────────┐
+│  ┌───┐                                       │
+│  │🖼️│  NOME PERSONA   ⭕ ⭕ 🚶 📶 ⭕ ⭕  │
+│  └───┘  📍 Posizione   📱 ⌚ 🏃 📡 🏠 🚗  │
+└──────────────────────────────────────────────┘
+     ▲         ▲                    ▲
+   Foto    Nome/Stato       Indicatori Circolari
+  (bordo                    (Batteria, Watch,
+  colorato)                  Distanza, Viaggio)
+```
+
+**Funzionalità Layout Modern:**
+- 🔵 **Anelli di Progresso Circolari** - Rappresentazione visiva di batteria %, distanza, tempo viaggio
+- 🟢 **Bordo Colorato per Stato** - Il bordo foto cambia in base allo stato (verde=casa, rosso=fuori, arancione=altro)
+- 🎯 **Badge Icone** - Attività e connessione mostrate come cerchi con icone
+- 📐 **Auto-Espandibile** - La larghezza card si adatta al numero di indicatori visibili
+- 🎨 **Font Personalizzabili** - Dimensioni font separate per nome e stato
+
 ---
 
 ## 📦 Installazione
@@ -575,7 +764,7 @@ Assicurati di avere [HACS](https://hacs.xyz/) installato, questo ti permetterà 
 1. Modifica dashboard → Aggiungi card
 2. Cerca **Person Tracker Card**
 3. Seleziona entità **person**
-4. Scegli **layout** (classic/compact)
+4. Scegli **layout** (classic/compact/modern)
 5. Configura sensori e stile
 
 ### YAML Base
@@ -583,7 +772,62 @@ Assicurati di avere [HACS](https://hacs.xyz/) installato, questo ti permetterà 
 ```yaml
 type: custom:person-tracker-card
 entity: person.davide
-layout: compact  # oppure 'classic'
+layout: modern  # oppure 'classic' o 'compact'
+```
+
+### Configurazione Layout Modern 🆕
+
+```yaml
+type: custom:person-tracker-card
+entity: person.davide
+layout: modern
+
+# Opzioni visualizzazione
+show_entity_picture: true
+show_person_name: true
+show_name: true
+show_battery: true
+show_watch_battery: true
+show_activity: true
+show_connection: true
+show_distance: true
+show_travel_time: true
+
+# Specifiche layout modern
+modern_picture_size: 45           # Dimensione foto in px (30-80)
+modern_name_font_size: '16px'     # Dimensione font nome
+modern_state_font_size: '13px'    # Dimensione font stato/posizione
+modern_travel_max_time: 60        # Tempo max viaggio per calcolo anello
+
+# Sensori personalizzati (opzionale)
+battery_sensor: sensor.phone_davide_battery_level
+watch_battery_sensor: sensor.watch_davide_battery_level
+activity_sensor: sensor.phone_davide_activity
+connection_sensor: sensor.phone_davide_connection_type
+distance_sensor: sensor.waze_davide
+travel_sensor: sensor.waze_davide
+
+# Stile
+card_background: 'rgba(255,255,255,0.05)'
+card_border_radius: '15px'
+
+# Stati personalizzati con colori (il colore bordo segue lo stato)
+state:
+  - value: home
+    name: 🏡 Casa
+    styles:
+      name:
+        color: '#50A14F'
+  - value: not_home
+    name: 🚗 Fuori
+    styles:
+      name:
+        color: '#e45649'
+  - value: work
+    name: 🏢 Ufficio
+    styles:
+      name:
+        color: '#ffa229'
 ```
 
 ### Configurazione Layout Compact
@@ -732,6 +976,46 @@ Per il tracciamento distanza:
 
 ## 🎭 Esempi
 
+### Layout Modern - Dashboard Famiglia 🆕
+
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:person-tracker-card
+    entity: person.davide
+    layout: modern
+    modern_picture_size: 50
+    modern_name_font_size: '16px'
+    state:
+      - value: home
+        name: 🏡 Casa
+        styles:
+          name:
+            color: '#50A14F'
+      - value: not_home
+        name: 🚗 Fuori
+        styles:
+          name:
+            color: '#e45649'
+    
+  - type: custom:person-tracker-card
+    entity: person.nunzia
+    layout: modern
+    modern_picture_size: 50
+    modern_name_font_size: '16px'
+    state:
+      - value: home
+        name: 🏡 Casa
+        styles:
+          name:
+            color: '#50A14F'
+      - value: not_home
+        name: 🚗 Fuori
+        styles:
+          name:
+            color: '#e45649'
+```
+
 ### Griglia Compact - Più Persone
 
 ```yaml
@@ -766,13 +1050,11 @@ type: vertical-stack
 cards:
   - type: custom:person-tracker-card
     entity: person.davide
-    layout: compact
-    compact_width: 250
+    layout: modern
     
   - type: custom:person-tracker-card
     entity: person.nunzia
-    layout: compact
-    compact_width: 250
+    layout: modern
 ```
 
 ### Layout Misto
@@ -789,26 +1071,24 @@ cards:
     cards:
       - type: custom:person-tracker-card
         entity: person.figlio1
-        layout: compact
-        compact_width: 240
+        layout: modern
         
       - type: custom:person-tracker-card
         entity: person.figlio2
-        layout: compact
-        compact_width: 240
+        layout: modern
 ```
 
-### Compact Minimale (Sidebar)
+### Modern Minimale (Sidebar)
 
 ```yaml
 type: custom:person-tracker-card
 entity: person.davide
-layout: compact
-compact_width: 200
-show_last_changed: false
+layout: modern
 show_watch_battery: false
 show_travel_time: false
 show_distance: false
+show_activity: false
+show_connection: false
 ```
 
 ---
@@ -836,22 +1116,41 @@ show_distance: false
 - Riavvia Home Assistant
 
 ### Layout non cambia
-- Verifica `layout: 'compact'` o `layout: 'classic'`
+- Verifica `layout: 'modern'` o `layout: 'compact'` o `layout: 'classic'`
 - I valori sono case-sensitive
 - Svuota cache e ricarica
+
+### I cerchi del layout Modern si sovrappongono al testo
+- Aggiorna all'ultima versione (v1.2.0+)
+- La card ora si espande automaticamente in base agli indicatori
 
 ---
 
 ## 📝 Changelog
 
+### v1.2.0 (2025-05-30) 🆕
+- ✨ **Nuovo Layout Modern** con indicatori circolari di progresso
+- 🔵 Anelli SVG circolari per batteria, watch, distanza, tempo viaggio
+- 🟢 Bordo foto colorato in base allo stato (verde/rosso/arancione)
+- 🎯 Badge icone per attività e connessione
+- ⚙️ Dimensioni font personalizzabili per layout Modern
+- 📐 Design responsive auto-espandibile
+- 🎨 Mapping icone attività migliorato con supporto attributi entità
+
+### v1.1.2 (2025-01-25)
+- 📏 Unità distanza dinamica dagli attributi entità
+- 🎯 Icona attività dinamica dagli attributi entità
+- 🔤 Personalizzazione font stato e last changed
+- 🤖 Corretto rilevamento WiFi Android
+
+### v1.1.1 (2024-11-24)
+- 🌍 Supporto multilingua completo (EN, IT, FR, DE)
+- 🔄 Rilevamento automatico lingua da Home Assistant
+
 ### v1.1.0 (2024-11-23)
 - ✨ Nuova modalità layout compact
 - 📏 Larghezza configurabile per layout compact (200-500px)
 - ⌚ Supporto batteria smartwatch
-- 🎨 Tab Position separato nell'editor
-- 📐 UI condizionale basata sul layout selezionato
-- 🐛 Corretto: Nome persona scompare con stati personalizzati in layout compact
-- 🎨 Nascosti campi stile non rilevanti in modalità compact
 
 ### v1.0.0 (2024-11-22)
 - 🎉 Prima release pubblica
