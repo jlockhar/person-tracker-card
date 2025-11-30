@@ -3,7 +3,107 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2025-05-30
+## [1.2.2] - 2025-05-30
+
+### Added
+- 📐 **Configurable Indicator Sizes** - New options to customize indicator dimensions for all layouts
+  - `classic_icon_size` - Icon size for Classic layout (12-32px, default: 16px)
+  - `compact_icon_size` - Icon size for Compact layout (12-32px, default: 16px)
+  - `modern_ring_size` - Ring size for Modern layout (28-60px, default: 38px)
+- 🔄 **Proportional Scaling (Compact)** - Entire card scales proportionally with icon size:
+  - Badge circles: `iconSize × 2`
+  - Profile picture: `iconSize × 2.5`
+  - Name font: `iconSize × 0.875`
+  - Location font: `iconSize × 0.625`
+  - Card padding and gaps scale automatically
+- 🔄 **Proportional Scaling (Modern)** - Ring content scales with ring size:
+  - Value font: ~29% of ring size
+  - Unit font: ~18% of ring size
+  - Icon size: ~58% of ring size
+- 🎨 **Layout-Specific Editor Sections** - New dedicated sections in Style tab:
+  - "Classic Layout Options" with icon size and font settings
+  - "Compact Layout Options" with proportional icon size
+  - "Modern Layout Options" with ring size and font settings
+- ⚡ **Battery Charging Animation** - Visual indicator when device is charging
+  - Pulse animation on battery indicators (all layouts)
+  - Lightning bolt icon ⚡ appears when charging
+  - Ring glows green when charging (Modern layout)
+  - Icon changes to `mdi:battery-charging` (Classic layout)
+- 🔌 **Charging State Sensors** - New configuration options:
+  - `battery_state_sensor` - Entity to monitor phone charging state
+  - `battery_charging_value` - Custom value for charging state (optional)
+  - `watch_battery_state_sensor` - Entity to monitor watch charging state
+  - `watch_battery_charging_value` - Custom value for watch charging (optional)
+- 🔍 **Auto-Detection of Charging States** - Recognizes multiple states:
+  - iOS: `Charging`,`Full`
+  - Android: `charging`, `discharging`, `full`
+  - Binary: `on`, `off`, `true`, `false`, `1`, `0`
+  - Power types: `ac`, `usb`, `wireless`
+  - Multilingual: `in carica`, `en charge`, `laden`, `aufladen`
+
+### Fixed
+- 🌓 **Light Theme Support** - Card now properly adapts to light/dark themes
+  - Ring background color adapts automatically (dark on light theme, light on dark theme)
+  - Text colors use HA CSS variables (`--primary-text-color`, `--secondary-text-color`)
+  - Badge backgrounds use `--secondary-background-color`
+  - Dividers use `--divider-color`
+  - Automatic theme detection based on `--primary-background-color` luminance
+- 🔧 **Watch Battery Badge Alignment** - Fixed vertical alignment in Compact layout
+
+### Changed
+- 📝 **Editor Helper Text** - Updated to explain proportional scaling behavior
+- 🔧 **Default Values** - Added proper defaults for all new size options
+
+### Translations
+- 🌍 **New Translation Keys** (IT/EN/FR/DE):
+  - `editor.classic_icon_size` - Classic icon size
+  - `editor.compact_icon_size` - Compact icon size
+  - `editor.modern_ring_size` - Modern ring size
+  - `editor.battery_font_size` - Battery font size
+  - `editor.activity_font_size` - Activity font size
+  - `editor.battery_state_sensor` - Phone charging state sensor
+  - `editor.battery_charging_value` - Charging state value
+  - `editor.watch_battery_state_sensor` - Watch charging state sensor
+  - `editor.watch_battery_charging_value` - Watch charging state value
+  - `editor.charging_helper` - Helper text for auto-detection
+  - `section.classic_options` - Classic Layout Options
+  - `section.compact_options` - Compact Layout Options
+
+---
+
+## [1.2.1] - 2025-11-30
+
+### Added
+- 🖱️ **Clickable Indicators** - All indicators now open their respective entity's more-info dialog
+  - Picture and name/state → opens person entity
+  - Battery → opens battery sensor
+  - Watch battery → opens watch battery sensor
+  - Activity → opens activity sensor
+  - Connection → opens connection sensor
+  - Distance → opens distance sensor
+  - Travel time → opens travel sensor
+- ✨ **Hover Effects** - Visual feedback on clickable elements (scale + opacity)
+- 🎨 **Dynamic Icons** - All icons now read from entity attributes with smart fallbacks
+  - Connection icon from entity or auto-detect WiFi/Signal
+  - Distance icon from entity or `mdi:map-marker-distance`
+  - Travel icon from entity or `mdi:car-clock`
+
+### Fixed
+- 🐛 **Editor Sensors Tab** - Entity pickers now always visible when editing saved cards
+  - Previously, sensor pickers disappeared after saving the card
+  - Pickers now show placeholder with default sensor pattern
+- 🐛 **Entity Picker Improvements**
+  - Added `allow-custom-entity` for manual entity input
+  - Extended supported domains: `sensor`, `input_number`, `binary_sensor`
+  - Empty default value prevents unwanted auto-selection
+
+### Changed
+- 🔧 **Sensor Flexibility** - Any entity type can now be used for any sensor slot
+- 📝 **Editor UX** - Sensor pickers always visible with default pattern as placeholder label
+
+---
+
+## [1.2.0] - 2025-11-30
 
 ### Added
 - 🎨 **Modern Layout** - New stylish layout with circular progress indicators
@@ -167,22 +267,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable aspect ratio
 - Adjustable image size
 - 8 position options for each element
+- **Configurable icon size** (v1.2.2)
 - Perfect for large dashboard cards
 
 #### Compact Layout (v1.1.0)
 - Space-efficient horizontal grid
-- Fixed 40x40px image
+- Configurable image size (scales with icons)
 - Bottom icon bar with all indicators
 - Configurable width (200-500px)
+- **Proportional scaling** (v1.2.2)
 - Perfect for multiple person tracking
 
-#### Modern Layout (v1.2.0) 🆕
+#### Modern Layout (v1.2.0)
 - Circular progress indicators for numeric values
 - Icon badges for activity and connection
 - State-colored profile picture border
 - Auto-expanding responsive design
-- Customizable font sizes
+- **Configurable ring size** (v1.2.2)
 - Perfect for modern, minimal dashboards
+
+#### Clickable Indicators (v1.2.1)
+- All elements open more-info dialog on click
+- Visual hover feedback
+- Works across all layouts
+
+#### Configurable Sizes (v1.2.2) 🆕
+- Classic: `classic_icon_size` (12-32px)
+- Compact: `compact_icon_size` (12-32px) with proportional scaling
+- Modern: `modern_ring_size` (28-60px) with proportional scaling
 
 ---
 
@@ -208,6 +320,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Version Links
+- [1.2.2]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.2.2
+- [1.2.1]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.2.1
 - [1.2.0]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.2.0
 - [1.1.2]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.1.2
 - [1.1.1]: https://github.com/djdevil/person-tracker-card/releases/tag/v1.1.1
