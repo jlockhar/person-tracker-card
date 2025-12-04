@@ -1,6 +1,6 @@
 // Person Tracker Card Editor - Multilanguage Version
 // Languages: Italian (default), English, French, German
-// v1.2.2: Bug fix, battery state, animation,fixed light theme
+// v1.2.3: Bug fix language, add hide state unknown activity status.
 
 const LitElement = Object.getPrototypeOf(
   customElements.get("ha-panel-lovelace") || customElements.get("hui-view")
