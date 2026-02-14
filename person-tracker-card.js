@@ -404,7 +404,7 @@ class PersonTrackerCard extends LitElement {
       entities.push(this.config.activity_sensor || `sensor.phone_${entityBase}_activity`);
     }
     if (this.config.show_connection) {
-      entities.push(this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type`);
+      entities.push(this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type` || `sensor.phone_${entityBase}_network_type`);
     }
     if (this.config.show_distance) {
       entities.push(this.config.distance_sensor || `sensor.waze_${entityBase}`);
@@ -514,7 +514,7 @@ class PersonTrackerCard extends LitElement {
 
     // Connection
     if (this.config.show_connection) {
-      const connectionEntityId = this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type`;
+      const connectionEntityId = this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type` || `sensor.phone_${entityBase}_network_type`;
       const connectionEntity = this.hass.states[connectionEntityId];
       if (connectionEntity) {
         this._connectionType = connectionEntity.state;
@@ -607,7 +607,7 @@ class PersonTrackerCard extends LitElement {
       'battery': this.config.battery_sensor || `sensor.phone_${entityBase}_battery_level`,
       'watch_battery': this.config.watch_battery_sensor || `sensor.watch_${entityBase}_battery_level`,
       'activity': this.config.activity_sensor || `sensor.phone_${entityBase}_activity`,
-      'connection': this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type`,
+      'connection': this.config.connection_sensor || `sensor.phone_${entityBase}_connection_type` || `sensor.phone_${entityBase}_network_type`,
       'distance': this.config.distance_sensor || `sensor.waze_${entityBase}`,
       'travel': this.config.travel_sensor || `sensor.home_work_${entityBase}`
     };
