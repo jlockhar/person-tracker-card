@@ -786,6 +786,13 @@ class PersonTrackerCard extends LitElement {
       `;
     }
 
+    // Call the Glance card editor to load the ha-enity-picker element
+    if (!this._glanceCard) {
+      this._glanceCard = customElements.get('hui-glance-card');
+      this._glanceCard.getConfigElement().then(() => this.requestUpdate());
+      return html`Loading...`;
+    }
+
     // Scegli il layout in base alla configurazione
     if (this.config.layout === 'compact') {
       return this._renderCompactLayout();
